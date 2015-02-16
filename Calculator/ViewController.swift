@@ -10,6 +10,10 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var display: UILabel!
+    
+    var userIsInTheMiddleOfTyping: Bool = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -20,6 +24,15 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
+    @IBAction func numberTouched(sender: UIButton) {
+        if (userIsInTheMiddleOfTyping) {
+            display.text! += sender.currentTitle!
+        }
+        else {
+            display.text = sender.currentTitle
+            userIsInTheMiddleOfTyping = true
+        }
+    }
 
 }
 
