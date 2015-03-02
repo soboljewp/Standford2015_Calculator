@@ -55,9 +55,12 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LMO-Wt-QQM">
                                 <rect key="frame" x="136" y="215" width="104" height="69"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                                <state key="normal">
+                                <state key="normal" title="⬅︎">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <connections>
+                                    <action selector="backTouched" destination="BYZ-38-t0r" eventType="touchUpInside" id="uoB-L3-CHb"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8KU-ta-CsR">
                                 <rect key="frame" x="248" y="215" width="104" height="69"/>

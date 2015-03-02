@@ -78,6 +78,18 @@ class ViewController: UIViewController {
         opStack.removeAll(keepCapacity: true)
     }
     
+    @IBAction func backTouched() {
+        if userIsInTheMiddleOfTyping {
+            let characters = countElements(display.text!)
+            if characters > 1 {
+                display.text! = dropLast(display.text!)
+            }
+            else {
+                displayValue = 0
+            }
+        }
+    }
+    
     // MARK:- Helpers
     func performOperation(operation: (Double, Double) -> Double) {
         if opStack.count >= 2 {
