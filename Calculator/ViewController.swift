@@ -11,6 +11,7 @@ import UIKit
 class ViewController: UIViewController {
 
     @IBOutlet weak var display: UILabel!
+    @IBOutlet weak var history: UILabel!
     
     var userIsInTheMiddleOfTyping: Bool = false
     
@@ -30,6 +31,10 @@ class ViewController: UIViewController {
         let digit = sender.currentTitle!
         
         if userIsInTheMiddleOfTyping {
+            if digit == "." && display.text?.rangeOfString(".") != nil {
+                return
+            }
+            
             display.text = display.text! + digit
         }
         else {
@@ -44,16 +49,36 @@ class ViewController: UIViewController {
         }
         
         let operation = sender.currentTitle!
+        
+        history.text! += "\(operation)\n"
+        
         switch operation {
         case "×": performOperation { $0 * $1 }
         case "÷": performOperation { $1 / $0 }
         case "+": performOperation { $0 + $1 }
         case "−": performOperation { $1 - $0 }
         case "√": performOperation { sqrt($0) }
+        case "sin": performOperation { sin($0) }
+        case "cos": performOperation { cos($0) }
+        case "π": performOperation { M_PI }
         default: break
         }
     }
     
+    @IBAction func enterTouched() {
+        userIsInTheMiddleOfTyping = false
+        opStack.append(displayValue)
+        println(opStack)
+        history.text! += "\(display.text!)\n"
+    }
+    
+    @IBAction func clearTouched() {
+        history.text = ""
+        display.text = "0"
+        opStack.removeAll(keepCapacity: true)
+    }
+    
+    // MARK:- Helpers
     func performOperation(operation: (Double, Double) -> Double) {
         if opStack.count >= 2 {
             displayValue = operation(opStack.removeLast(),opStack.removeLast())
@@ -68,10 +93,9 @@ class ViewController: UIViewController {
         }
     }
     
-    @IBAction func enterTouched() {
-        userIsInTheMiddleOfTyping = false
-        opStack.append(displayValue)
-        println(opStack)
+    func performOperation(operation: () -> Double) {
+        displayValue = operation()
+        enterTouched()
     }
     
     var displayValue: Double {
