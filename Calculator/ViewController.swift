@@ -75,17 +75,20 @@ class ViewController: UIViewController {
     
     @IBAction func enterTouched() {
         userIsInTheMiddleOfTyping = false
-        opStack.append(displayValue)
-        println(opStack)
-        
-        markDisplayAsResult(false)
-        
-        history.text! += "\(display.text!)\n"
+        if let value = displayValue {
+            opStack.append(value)
+            println(opStack)
+            
+            markDisplayAsResult(false)
+            
+            history.text! += "\(display.text!)\n"
+        }
+
     }
     
     @IBAction func clearTouched() {
         history.text = ""
-        display.text = "0"
+        displayValue = nil
         opStack.removeAll(keepCapacity: true)
     }
     
@@ -134,13 +137,18 @@ class ViewController: UIViewController {
         }
     }
     
-    var displayValue: Double {
+    var displayValue: Double? {
         get{
-            return NSNumberFormatter().numberFromString(display.text!)!.doubleValue
+            return NSNumberFormatter().numberFromString(display.text!)?.doubleValue
         }
         
         set {
-            display.text = "\(newValue)"
+            if let value = newValue {
+                display.text! = "\(value)"
+            }
+            else {
+                display.text! = "0"
+            }
             userIsInTheMiddleOfTyping = false
         }
     }
