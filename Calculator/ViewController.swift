@@ -44,11 +44,18 @@ class ViewController: UIViewController {
     }
 
     @IBAction func operatorTouched(sender: UIButton) {
-        if userIsInTheMiddleOfTyping {
-            enterTouched()
-        }
-        
         let operation = sender.currentTitle!
+        
+        if userIsInTheMiddleOfTyping {
+            if operation != "±" {
+                enterTouched()
+            }
+            else {
+                display.text! = "-" + display.text!
+                return
+            }
+            
+        }
         
         history.text! += "\(operation)\n"
         
@@ -61,6 +68,7 @@ class ViewController: UIViewController {
         case "sin": performOperation { sin($0) }
         case "cos": performOperation { cos($0) }
         case "π": performOperation { M_PI }
+        case "±": performOperation { -1 * $0 }
         default: break
         }
     }

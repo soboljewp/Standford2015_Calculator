@@ -219,9 +219,12 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FNr-vJ-FIL">
                                 <rect key="frame" x="472" y="215" width="104" height="69"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                                <state key="normal">
+                                <state key="normal" title="±">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <connections>
+                                    <action selector="operatorTouched:" destination="BYZ-38-t0r" eventType="touchUpInside" id="g3M-YM-Elt"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tko-Bq-Aps">
                                 <rect key="frame" x="248" y="523" width="104" height="69"/>
