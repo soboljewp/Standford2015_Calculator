@@ -69,6 +69,9 @@ class ViewController: UIViewController {
         userIsInTheMiddleOfTyping = false
         opStack.append(displayValue)
         println(opStack)
+        
+        markDisplayAsResult(false)
+        
         history.text! += "\(display.text!)\n"
     }
     
@@ -95,6 +98,7 @@ class ViewController: UIViewController {
         if opStack.count >= 2 {
             displayValue = operation(opStack.removeLast(),opStack.removeLast())
             enterTouched()
+            markDisplayAsResult(true)
         }
     }
     
@@ -102,12 +106,24 @@ class ViewController: UIViewController {
         if opStack.count >= 1 {
             displayValue = operation(opStack.removeLast())
             enterTouched()
+            markDisplayAsResult(true)
         }
     }
     
     func performOperation(operation: () -> Double) {
         displayValue = operation()
         enterTouched()
+    }
+    
+    func markDisplayAsResult(mark: Bool) {
+        if mark {
+            history.text! += "="
+        }
+        else {
+            if history.text!.rangeOfString("=") != nil {
+                history.text! = history.text!.stringByReplacingOccurrencesOfString("=", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
+            }
+        }
     }
     
     var displayValue: Double {
