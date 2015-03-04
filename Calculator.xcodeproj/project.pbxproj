@@ -14,6 +14,7 @@
 		CD7DFEED1A92698100A1BD40 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CD7DFEEC1A92698100A1BD40 /* Images.xcassets */; };
 		CD7DFEF01A92698100A1BD40 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD7DFEEE1A92698100A1BD40 /* LaunchScreen.xib */; };
 		CD7DFEFC1A92698100A1BD40 /* CalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7DFEFB1A92698100A1BD40 /* CalculatorTests.swift */; };
+		CD9E5FAE1AA4766D00F3B43B /* CalculatorBrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9E5FAD1AA4766D00F3B43B /* CalculatorBrain.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +39,7 @@
 		CD7DFEF51A92698100A1BD40 /* CalculatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CalculatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD7DFEFA1A92698100A1BD40 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CD7DFEFB1A92698100A1BD40 /* CalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorTests.swift; sourceTree = "<group>"; };
+		CD9E5FAD1AA4766D00F3B43B /* CalculatorBrain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalculatorBrain.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +82,7 @@
 			isa = PBXGroup;
 			children = (
 				CD7DFEE71A92698100A1BD40 /* ViewController.swift */,
+				CD9E5FAD1AA4766D00F3B43B /* CalculatorBrain.swift */,
 				CD7DFEE91A92698100A1BD40 /* Main.storyboard */,
 				CD7DFEE01A92698100A1BD40 /* Supporting Files */,
 			);
@@ -217,6 +220,7 @@
 			files = (
 				CD7DFEE81A92698100A1BD40 /* ViewController.swift in Sources */,
 				CD7DFEE31A92698100A1BD40 /* AppDelegate.swift in Sources */,
+				CD9E5FAE1AA4766D00F3B43B /* CalculatorBrain.swift in Sources */,
 				CD7DFEE61A92698100A1BD40 /* Calculator.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -411,6 +415,7 @@
 				CD7DFF011A92698100A1BD40 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		CD7DFF021A92698100A1BD40 /* Build configuration list for PBXNativeTarget "CalculatorTests" */ = {
 			isa = XCConfigurationList;
@@ -419,6 +424,7 @@
 				CD7DFF041A92698100A1BD40 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
