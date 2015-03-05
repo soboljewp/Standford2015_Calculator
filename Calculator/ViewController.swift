@@ -31,11 +31,9 @@ class ViewController: UIViewController {
         let digit = sender.currentTitle!
         
         if userIsInTheMiddleOfTyping {
-            if digit == "." && display.text?.rangeOfString(".") != nil {
-                return
+            if digit != "." || (digit == "." && !isDisplayValueDecimal()) {
+                display.text = display.text! + digit
             }
-            
-            display.text = display.text! + digit
         }
         else {
             display.text = digit
@@ -108,6 +106,10 @@ class ViewController: UIViewController {
                 history.text! = history.text!.stringByReplacingOccurrencesOfString("=", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
             }
         }
+    }
+    
+    func isDisplayValueDecimal() -> Bool {
+        return display.text?.rangeOfString(".") != nil
     }
     
     var displayValue: Double? {
