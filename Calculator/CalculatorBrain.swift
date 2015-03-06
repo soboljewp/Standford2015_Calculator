@@ -12,21 +12,25 @@ class CalculatorBrain {
     
     private enum Op: Printable {
         case Operand(Double)
-        case NamedOperand(String, Double)
+        case Constant(String, Double)
         case UnaryOperation(String, Double -> Double)
         case BinaryOperation(String, (Double, Double) -> Double)
+        case Variable(String)
         
         var description: String {
             get {
                 switch self {
                 case .Operand(let value):
                     return "\(value)"
-                case .NamedOperand(let symbol, _):
+                case .Constant(let symbol, _):
+                    return symbol
+                case .Variable(let symbol):
                     return symbol
                 case .UnaryOperation(let symbol, _):
                     return symbol
                 case .BinaryOperation(let symbol, _):
                     return symbol
+                default: return ""
                 }
             }
         }
@@ -35,6 +39,8 @@ class CalculatorBrain {
     private var opStack = [Op]()
     
     private var knownOps = [String:Op]()
+    
+    var variableValues: [String:Double] = [:]
     
     init() {
         func learnOperation(operation: Op) {
@@ -49,7 +55,7 @@ class CalculatorBrain {
         learnOperation(Op.UnaryOperation("sin") { sin($0) })
         learnOperation(Op.UnaryOperation("cos") { cos($0) })
         learnOperation(Op.UnaryOperation("±") { -1 * $0 })
-        learnOperation(Op.NamedOperand("π", M_PI))
+        learnOperation(Op.Constant("π", M_PI))
     }
     
     private func evaluate(ops: [Op]) -> (result: Double?, remainingOps: [Op]) {
@@ -59,8 +65,10 @@ class CalculatorBrain {
             switch op {
             case .Operand(let operand):
                 return (operand, remainingOps)
-            case .NamedOperand(_, let operand):
+            case .Constant(_, let operand):
                 return (operand, remainingOps)
+            case .Variable(let symbol):
+                return (variableValues[symbol], remainingOps)
             case .UnaryOperation(_, let operation):
                 let operandEvaluation = evaluate(remainingOps)
                 if let operand = operandEvaluation.result {
@@ -74,10 +82,40 @@ class CalculatorBrain {
                         return (operation(operand1, operand2), op2Evaluation.remainingOps)
                     }
                 }
+            default: return(nil, remainingOps)
             }
         }
         
         return (nil, ops)
+    }
+    
+    private func description(ops: [Op]) -> (result: String, remainingOps: [Op]) {
+        if !ops.isEmpty {
+            var remainingOps = ops
+            let op = remainingOps.removeLast()
+            
+            switch op {
+                
+            case .UnaryOperation(let symbol, _):
+                let operandDescription = description(remainingOps)
+                let opStr = operandDescription.result ?? "?"
+                
+                return ("\(op.description)(\(opStr))", operandDescription.remainingOps)
+                
+            case .BinaryOperation(_, _):
+                let op1Description = description(remainingOps)
+                let op2Description = description(op1Description.remainingOps)
+                let op1Str = op1Description.result ?? "?"
+                let op2Str = op2Description.result ?? "?"
+                
+                return ("\(op2Str) \(op.description) \(op1Str)", op2Description.remainingOps)
+                
+            default:
+                return (op.description, remainingOps)
+            }
+        }
+        
+        return ("", ops)
     }
     
     func evaluate() -> Double? {
@@ -90,11 +128,24 @@ class CalculatorBrain {
         return evaluate()
     }
     
+    func pushOperand(symbol: String) -> Double? {
+        opStack.append(Op.Variable(symbol))
+        return evaluate()
+    }
+    
     func performOperation(symbol: String) -> Double? {
         if let operation = knownOps[symbol] {
             opStack.append(operation)
         }
         
         return evaluate()
+    }
+    
+    // MARK:- Computed properties
+    var description: String {
+        get {
+            let (result, remainder) = description(opStack)
+            return "\(result) ="
+        }
     }
 }

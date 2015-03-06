@@ -54,16 +54,8 @@ class ViewController: UIViewController {
                 }
             }
             
-            history.text! += "\(operation)\n"
-            
-            if let result = brain.performOperation(operation) {
-                displayValue = result
-                history.text! += "\(result)\n"
-            }
-            else {
-                displayValue = 0
-                history.text! += "\(0)\n"
-            }
+            displayValue = brain.performOperation(operation)
+            history.text = brain.description
         }
     }
     
@@ -72,16 +64,14 @@ class ViewController: UIViewController {
         if let value = displayValue {
             let result = brain.pushOperand(value)
             displayValue = result
-            markDisplayAsResult(false)
             
-            history.text! += "\(display.text!)\n"
+            history.text = brain.description
         }
     }
     
     @IBAction func clearTouched() {
         displayValue = 0
-        history.text = ""
-        displayValue = nil
+        history.text = " "
     }
     
     @IBAction func backTouched() {
@@ -97,24 +87,14 @@ class ViewController: UIViewController {
     }
     
     // MARK:- Helpers
-    func markDisplayAsResult(mark: Bool) {
-        if mark {
-            history.text! += "="
-        }
-        else {
-            if history.text!.rangeOfString("=") != nil {
-                history.text! = history.text!.stringByReplacingOccurrencesOfString("=", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
-            }
-        }
-    }
-    
     func isDisplayValueDecimal() -> Bool {
         return display.text?.rangeOfString(".") != nil
     }
     
     var displayValue: Double? {
         get{
-            return NSNumberFormatter().numberFromString(display.text!)?.doubleValue
+            let result = NSNumberFormatter().numberFromString(display.text!)?.doubleValue
+            return result
         }
         
         set {
@@ -122,7 +102,7 @@ class ViewController: UIViewController {
                 display.text! = "\(value)"
             }
             else {
-                display.text! = "0"
+                display.text! = " "
             }
             userIsInTheMiddleOfTyping = false
         }
