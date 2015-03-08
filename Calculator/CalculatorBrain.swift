@@ -14,8 +14,8 @@ class CalculatorBrain {
     private enum Op: Printable {
         case Operand(Double)
         case Constant(String, Double)
-        case UnaryOperation(String, Double -> Double)
-        case BinaryOperation(String, Int, (Double, Double) -> Double)
+        case UnaryOperation(String, Double -> Double, (Double -> String?)?)
+        case BinaryOperation(String, Int, (Double, Double) -> Double, ((Double, Double) -> String?)?)
         case Variable(String)
         
         var description: String {
@@ -27,9 +27,9 @@ class CalculatorBrain {
                     return symbol
                 case .Variable(let symbol):
                     return symbol
-                case .UnaryOperation(let symbol, _):
+                case .UnaryOperation(let symbol, _, _):
                     return symbol
-                case .BinaryOperation(let symbol, _, _):
+                case .BinaryOperation(let symbol, _, _, _):
                     return symbol
                 default: return ""
                 }
@@ -39,7 +39,7 @@ class CalculatorBrain {
         var precedence: Int {
             get {
                 switch self {
-                case .BinaryOperation(_, let precedence, _):
+                case .BinaryOperation(_, let precedence, _, _):
                     return precedence
                 default:
                     return Int.max
@@ -53,23 +53,29 @@ class CalculatorBrain {
     
     private var knownOps = [String:Op]()
     
+    private var error: String?
+    
     var variableValues: [String:Double] = [:]
     
     // MARK:- Computed properties
     var description: String {
         get {
-            var desc = ""
-            var remainder: [Op]
-            var expr: String
-            
-            (desc, remainder, _) = description(opStack)
-            
-            while !remainder.isEmpty {
-                (expr, remainder, _) = description(remainder)
-                desc = "\(expr), " + desc
+            if opStack.count > 0 {
+                var desc = ""
+                var remainder: [Op]
+                var expr: String
+                
+                (desc, remainder, _) = description(opStack)
+                
+                while !remainder.isEmpty {
+                    (expr, remainder, _) = description(remainder)
+                    desc = "\(expr), " + desc
+                }
+                
+                return "\(desc) ="
             }
             
-            return "\(desc) ="
+            return " "
         }
     }
     
@@ -79,21 +85,30 @@ class CalculatorBrain {
             knownOps[operation.description] = operation
         }
         
-        learnOperation(Op.BinaryOperation("×", 2, *))
-        learnOperation(Op.BinaryOperation("÷", 2) { $1 / $0 })
-        learnOperation(Op.BinaryOperation("+", 1, +))
-        learnOperation(Op.BinaryOperation("−", 1) { $1 - $0 })
-        learnOperation(Op.UnaryOperation("√", sqrt))
-        learnOperation(Op.UnaryOperation("sin") { sin($0) })
-        learnOperation(Op.UnaryOperation("cos") { cos($0) })
-        learnOperation(Op.UnaryOperation("±") { -1 * $0 })
+        learnOperation(Op.BinaryOperation("×", 2, *, nil))
+        learnOperation(Op.BinaryOperation("÷", 2, { $1 / $0 }, { div, _ in div == 0 ? "div by 0" : nil }))
+        learnOperation(Op.BinaryOperation("+", 1, +, nil))
+        learnOperation(Op.BinaryOperation("−", 1, { $1 - $0 }, nil))
+        learnOperation(Op.UnaryOperation("√", sqrt, { $0 < 0 ? "sqrt on negative op" : nil }))
+        learnOperation(Op.UnaryOperation("sin", { sin($0) }, nil))
+        learnOperation(Op.UnaryOperation("cos", { cos($0) }, nil))
+        learnOperation(Op.UnaryOperation("±", { -1 * $0 }, nil))
         learnOperation(Op.Constant("π", M_PI))
     }
     
     func evaluate() -> Double? {
-        let (result, remainder) = evaluate(opStack)
-        println("Result: \(result) with remainder: \(remainder)")
-        return result
+        if opStack.count > 0 {
+            let (result, remainder) = evaluate(opStack)
+            println("Result: \(result) with remainder: \(remainder)")
+            return result
+        }
+        return 0
+    }
+    
+    func evaluateAndReportErrors() -> String? {
+        error = " "
+        let (result, _) = evaluate(opStack)
+        return result == nil ? error : nil
     }
     
     func pushOperand(operand: Double) -> Double? {
@@ -135,27 +150,47 @@ class CalculatorBrain {
             var remainingOps = ops
             let op = remainingOps.removeLast()
             switch op {
+                
             case .Operand(let operand):
                 return (operand, remainingOps)
+                
             case .Constant(_, let operand):
                 return (operand, remainingOps)
+                
             case .Variable(let symbol):
-                return (variableValues[symbol], remainingOps)
-            case .UnaryOperation(_, let operation):
+                if let value = variableValues[symbol] {
+                    return(value, remainingOps)
+                }
+                error = "Var not set"
+                return (nil, remainingOps)
+                
+            case .UnaryOperation(_, let operation, let errorEval):
                 let operandEvaluation = evaluate(remainingOps)
                 if let operand = operandEvaluation.result {
+                    if let errorMsg = errorEval?(operand) {
+                        error = errorMsg
+                        return (nil, operandEvaluation.remainingOps)
+                    }
                     return (operation(operand), operandEvaluation.remainingOps)
                 }
-            case .BinaryOperation(_, _, let operation):
+                
+            case .BinaryOperation(_, _, let operation, let errorEval):
                 let op1Evaluation = evaluate(remainingOps)
                 if let operand1 = op1Evaluation.result {
                     let op2Evaluation = evaluate(op1Evaluation.remainingOps)
                     if let operand2 = op2Evaluation.result {
+                        if let errorMsg = errorEval?(operand1, operand2) {
+                            error = errorMsg
+                            return (nil, op2Evaluation.remainingOps)
+                        }
                         return (operation(operand1, operand2), op2Evaluation.remainingOps)
                     }
                 }
+                
             default: return(nil, remainingOps)
             }
+            
+            error = "Not enough operands"
         }
         
         return (nil, ops)
@@ -174,7 +209,7 @@ class CalculatorBrain {
                 
             case .Operand(let value):
                 return (String(format: "%g", value) , remainingOps, op.precedence)
-            case .UnaryOperation(let symbol, _):
+            case .UnaryOperation(let symbol, _, _):
                 let operand = description(remainingOps)
                 
                 var result = symbol
@@ -182,7 +217,7 @@ class CalculatorBrain {
                 
                 return (result, operand.remainingOps, op.precedence)
                 
-            case .BinaryOperation(_, let precedence, _):
+            case .BinaryOperation(_, let precedence, _, _):
                 let op1 = description(remainingOps)
                 var op1Str = op1.result
                 if op1.precedence < precedence {

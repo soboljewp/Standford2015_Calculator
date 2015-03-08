@@ -124,7 +124,12 @@ class ViewController: UIViewController {
                 display.text! = "\(value)"
             }
             else {
-                display.text! = " "
+                if let error = brain.evaluateAndReportErrors() {
+                    display.text! = error
+                }
+                else {
+                    display.text! = " "
+                }
             }
             userIsInTheMiddleOfTyping = false
         }
