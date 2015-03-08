@@ -38,6 +38,7 @@ class ViewController: UIViewController {
         else {
             display.text = digit
             userIsInTheMiddleOfTyping = true
+            history.text = " "
         }
     }
 
@@ -62,9 +63,7 @@ class ViewController: UIViewController {
     @IBAction func enterTouched() {
         userIsInTheMiddleOfTyping = false
         if let value = displayValue {
-            let result = brain.pushOperand(value)
-            displayValue = result
-            
+            displayValue = brain.pushOperand(value)
             history.text = brain.description
         }
     }
@@ -72,6 +71,9 @@ class ViewController: UIViewController {
     @IBAction func clearTouched() {
         displayValue = 0
         history.text = " "
+        
+        brain.clearStack()
+        brain.clearVariables()
     }
     
     @IBAction func backTouched() {
@@ -84,6 +86,16 @@ class ViewController: UIViewController {
                 displayValue = 0
             }
         }
+    }
+    @IBAction func storeDisplayIntoVariable() {
+        if let value = displayValue {
+            brain.variableValues["M"] = value
+        }
+    }
+
+    @IBAction func pushVariable() {
+        displayValue = brain.pushOperand("M")
+        history.text = brain.description
     }
     
     // MARK:- Helpers
