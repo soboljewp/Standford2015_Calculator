@@ -111,14 +111,15 @@ class CalculatorBrain {
             
             switch op {
                 
+            case .Operand(let value):
+                return (String(format: "%g", value) , remainingOps, op.precedence)
             case .UnaryOperation(let symbol, _):
-                let operandDescription = description(remainingOps)
-                let opStr = operandDescription.result ?? "?"
+                let operand = description(remainingOps)
                 
-                var result = op.description
-                result += encapsulateInParenthesis(opStr)
+                var result = symbol
+                result += encapsulateInParenthesis(operand.result)
                 
-                return (result, operandDescription.remainingOps, op.precedence)
+                return (result, operand.remainingOps, op.precedence)
                 
             case .BinaryOperation(_, let precedence, _):
                 let op1 = description(remainingOps)
