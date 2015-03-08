@@ -86,10 +86,15 @@ class ViewController: UIViewController {
                 displayValue = 0
             }
         }
+        else {
+            brain.popOperandFromStack()
+            updateDisplay()
+        }
     }
     @IBAction func storeDisplayIntoVariable() {
         if let value = displayValue {
             brain.variableValues["M"] = value
+            updateDisplay()
         }
     }
 
@@ -101,6 +106,11 @@ class ViewController: UIViewController {
     // MARK:- Helpers
     func isDisplayValueDecimal() -> Bool {
         return display.text?.rangeOfString(".") != nil
+    }
+    
+    func updateDisplay() {
+        displayValue = brain.evaluate()
+        history.text = brain.description
     }
     
     var displayValue: Double? {

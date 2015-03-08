@@ -10,6 +10,7 @@ import Foundation
 
 class CalculatorBrain {
     
+    // MARK: - private enum Op
     private enum Op: Printable {
         case Operand(Double)
         case Constant(String, Double)
@@ -47,12 +48,32 @@ class CalculatorBrain {
         }
     }
     
+    // MARK: - Members
     private var opStack = [Op]()
     
     private var knownOps = [String:Op]()
     
     var variableValues: [String:Double] = [:]
     
+    // MARK:- Computed properties
+    var description: String {
+        get {
+            var desc = ""
+            var remainder: [Op]
+            var expr: String
+            
+            (desc, remainder, _) = description(opStack)
+            
+            while !remainder.isEmpty {
+                (expr, remainder, _) = description(remainder)
+                desc = "\(expr), " + desc
+            }
+            
+            return "\(desc) ="
+        }
+    }
+    
+    // MAKR: - Methods
     init() {
         func learnOperation(operation: Op) {
             knownOps[operation.description] = operation
@@ -68,6 +89,46 @@ class CalculatorBrain {
         learnOperation(Op.UnaryOperation("±") { -1 * $0 })
         learnOperation(Op.Constant("π", M_PI))
     }
+    
+    func evaluate() -> Double? {
+        let (result, remainder) = evaluate(opStack)
+        println("Result: \(result) with remainder: \(remainder)")
+        return result
+    }
+    
+    func pushOperand(operand: Double) -> Double? {
+        opStack.append(Op.Operand(operand))
+        return evaluate()
+    }
+    
+    func pushOperand(symbol: String) -> Double? {
+        opStack.append(Op.Variable(symbol))
+        return evaluate()
+    }
+    
+    func performOperation(symbol: String) -> Double? {
+        if let operation = knownOps[symbol] {
+            opStack.append(operation)
+        }
+        
+        return evaluate()
+    }
+    
+    func popOperandFromStack() {
+        if !opStack.isEmpty {
+            opStack.removeLast()
+        }
+    }
+    
+    func clearStack() {
+        opStack = []
+    }
+    
+    func clearVariables() {
+        variableValues = [:]
+    }
+    
+    // MARK: - private methods
     
     private func evaluate(ops: [Op]) -> (result: Double?, remainingOps: [Op]) {
         if !ops.isEmpty {
@@ -143,55 +204,5 @@ class CalculatorBrain {
         }
         
         return ("?", ops, Int.max)
-    }
-    
-    func evaluate() -> Double? {
-        let (result, remainder) = evaluate(opStack)
-        println("Result: \(result) with remainder: \(remainder)")
-        return result
-    }
-    
-    func pushOperand(operand: Double) -> Double? {
-        opStack.append(Op.Operand(operand))
-        return evaluate()
-    }
-    
-    func pushOperand(symbol: String) -> Double? {
-        opStack.append(Op.Variable(symbol))
-        return evaluate()
-    }
-    
-    func performOperation(symbol: String) -> Double? {
-        if let operation = knownOps[symbol] {
-            opStack.append(operation)
-        }
-        
-        return evaluate()
-    }
-    
-    func clearStack() {
-        opStack = []
-    }
-    
-    func clearVariables() {
-        variableValues = [:]
-    }
-    
-    // MARK:- Computed properties
-    var description: String {
-        get {
-            var desc = ""
-            var remainder: [Op]
-            var expr: String
-            
-            (desc, remainder, _) = description(opStack)
-            
-            while !remainder.isEmpty {
-                (expr, remainder, _) = description(remainder)
-                desc = "\(expr), " + desc
-            }
-            
-            return "\(desc) ="
-        }
     }
 }
